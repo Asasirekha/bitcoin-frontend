@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
+  ResponsiveContainer,
   LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   Legend,
 } from "recharts";
 
+// Helper to format currency
 const formatCurrency = (value, currency) => {
+  if (!value && value !== 0) return "-";
   return currency === "USD"
-    ? `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-    : `₹${value.toLocaleString(undefined, { minimumFractionDigits: 0 })}`;
+    ? `$${Number(value).toLocaleString()}`
+    : `₹${Number(value).toLocaleString()}`;
 };
 
+// Custom tooltip for the chart
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     const usd = payload.find((p) => p.dataKey === "price_usd")?.value;
@@ -41,21 +44,21 @@ const PredictionDashboard = () => {
   useEffect(() => {
     const fetchPredictions = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/predict?start_date=${selectedDate}`);
-
+        const res = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/predict?start_date=${selectedDate}`
+        );
         setPredictions(res.data);
       } catch (err) {
+        setPredictions({ error: "Failed to fetch predictions." });
         console.error("Error:", err);
       }
     };
-
     fetchPredictions();
   }, [selectedDate]);
 
   return (
     <div className="max-w-5xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Bitcoin Price Prediction</h1>
-
       <div className="flex justify-center mb-6">
         <label className="flex items-center gap-2">
           <span className="text-lg font-medium">Select Date:</span>
@@ -67,7 +70,6 @@ const PredictionDashboard = () => {
           />
         </label>
       </div>
-
       {!predictions ? (
         <p className="text-center">Loading predictions...</p>
       ) : predictions.error ? (
@@ -77,13 +79,14 @@ const PredictionDashboard = () => {
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-center">
             {predictions.map((item, index) => (
               <li key={index} className="bg-gray-100 p-3 rounded shadow">
-                <strong>{item.date}</strong><br />
-                USD: {formatCurrency(item.price_usd, "USD")}<br />
+                <strong>{item.date}</strong>
+                <br />
+                USD: {formatCurrency(item.price_usd, "USD")}
+                <br />
                 INR: {formatCurrency(item.price_inr, "INR")}
               </li>
             ))}
           </ul>
-
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={predictions} margin={{ top: 10, right: 50, left: 0, bottom: 30 }}>
               <CartesianGrid strokeDasharray="3 3" />
