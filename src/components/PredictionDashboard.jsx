@@ -11,7 +11,6 @@ import {
   Legend,
 } from "recharts";
 
-// Helper to format currency
 const formatCurrency = (value, currency) => {
   if (!value && value !== 0) return "-";
   return currency === "USD"
@@ -19,7 +18,6 @@ const formatCurrency = (value, currency) => {
     : `₹${Number(value).toLocaleString()}`;
 };
 
-// Custom tooltip for the chart
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     const usd = payload.find((p) => p.dataKey === "price_usd")?.value;
