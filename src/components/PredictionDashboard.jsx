@@ -41,7 +41,8 @@ const PredictionDashboard = () => {
   useEffect(() => {
     const fetchPredictions = async () => {
       try {
-        const res = await axios.get(`http://127.0.0.1:5000/predict?start_date=${selectedDate}`);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/predict?start_date=${selectedDate}`);
+
         setPredictions(res.data);
       } catch (err) {
         console.error("Error:", err);
