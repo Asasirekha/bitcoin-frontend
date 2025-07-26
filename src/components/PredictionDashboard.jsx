@@ -78,22 +78,25 @@ const PredictionDashboard = () => {
   }, [selectedDate]);
 
   // For demo: split predictions into historical and predicted
-let historicalLength = 0;
-if (Array.isArray(predictions) && predictions.length > 7) {
-  historicalLength = 7;
-}
+  let historicalLength = 0;
+  if (Array.isArray(predictions) && predictions.length > 7) {
+    historicalLength = 7;
+  }
 
-// Merge for chart: add a "type" field
-const chartData = Array.isArray(predictions)
-  ? predictions.map((item, idx) => ({
-      ...item,
-      type:
-        historicalLength && idx < historicalLength
-          ? "historical"
-          : "predicted",
-    }))
-  : [];
+  // Merge for chart: add a "type" field
+  const chartData = Array.isArray(predictions)
+    ? predictions.map((item, idx) => ({
+        ...item,
+        type:
+          historicalLength && idx < historicalLength
+            ? "historical"
+            : "predicted",
+      }))
+    : [];
 
+  // Split chartData for historical and predicted
+  const historicalData = chartData.filter((d) => d.type === "historical");
+  const predictedData = chartData.filter((d) => d.type === "predicted");
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -179,7 +182,7 @@ const chartData = Array.isArray(predictions)
                 name="Historical"
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
-                data={chartData.filter((d) => d.type === "historical")}
+                data={historicalData}
                 isAnimationActive={false}
               />
               {/* Predicted Line */}
@@ -193,7 +196,7 @@ const chartData = Array.isArray(predictions)
                 name="Predicted"
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
-                data={chartData.filter((d) => d.type === "predicted")}
+                data={predictedData}
                 isAnimationActive={false}
               />
               <Brush dataKey="date" height={30} stroke="#8884d8" />
